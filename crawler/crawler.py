@@ -5,7 +5,7 @@ import time
 import re
 from urllib import robotparser
 from datetime import datetime
-import sqlite3
+import mysql.connector
 
 
 class MrCrawl:
@@ -17,13 +17,20 @@ class MrCrawl:
         self.to_visit = []
 
         # --- DB CONNECTION ---
-        self.conn = sqlite3.connect(db_path)
+        self.conn = mysql.connector.connect(
+            host="YOUR_HOST",
+            user="YOUR_USER",
+            password="YOUR_PASSWORD",
+            database="YOUR_DB",
+            port=3306
+        )
+        
         self.cursor = self.conn.cursor()
 
         # Création des tables si elles n'existent pas
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS sites (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             url TEXT,
             title TEXT,
             description TEXT,
@@ -33,7 +40,7 @@ class MrCrawl:
 
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS news (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INT AUTO_INCREMENT PRIMARY KEY,
             url TEXT,
             title TEXT,
             description TEXT,
