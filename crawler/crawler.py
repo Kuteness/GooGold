@@ -56,6 +56,10 @@ class MrCrawl:
         except:
             return True
 
+
+    def _force_english_url(self, url):
+        return url.replace("/fr/", "/en/").replace("/de/", "/en/").replace("/es/", "/en/")
+        
     def _normalize_url(self, base, link):
         return urljoin(base, link.split('#')[0])
 
@@ -97,6 +101,7 @@ class MrCrawl:
 
         while self.to_visit:
             url, depth = self.to_visit.pop(0)
+            url = self._force_english_url(url)
 
             if url in self.visited or depth > self.max_depth:
                 continue
@@ -108,7 +113,12 @@ class MrCrawl:
                 continue
 
             try:
-                resp = requests.get(url, timeout=10, headers={'User-Agent': 'LoogleBot/1.0'})
+                headers = {
+                    'User-Agent': 'LoogleBot/1.0',
+                    'Accept-Language': 'en-US,en;q=0.9'
+                }
+                
+                resp = requests.get(url, timeout=10, headers=headers)
 
                 if resp.status_code != 200 or 'text/html' not in resp.headers.get('Content-Type', ''):
                     continue
